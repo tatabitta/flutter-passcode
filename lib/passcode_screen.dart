@@ -45,8 +45,8 @@ class PasscodeScreen extends StatefulWidget {
     KeyboardUIConfig? keyboardUIConfig,
     this.bottomWidget,
     this.backgroundColor,
-    this.bioButton,
     this.cancelCallback,
+    this.bioButton,
     this.digits,
   })  : circleUIConfig = circleUIConfig ?? const CircleUIConfig(),
         keyboardUIConfig = keyboardUIConfig ?? const KeyboardUIConfig(),
@@ -125,18 +125,6 @@ class _PasscodeScreenState extends State<PasscodeScreen>
                 ],
               ),
             ),
-          ),
-          Positioned(
-            child: Align(
-              alignment: Alignment.bottomRight,
-              child: _buildDeleteButton(),
-            ),
-          ),
-          Positioned(
-            child: Align(
-              alignment: Alignment.bottomLeft,
-              child: widget.bioButton != null ? widget.bioButton : Container(),
-            ),
           )
         ],
       );
@@ -201,6 +189,18 @@ class _PasscodeScreenState extends State<PasscodeScreen>
           onKeyboardTap: _onKeyboardButtonPressed,
           keyboardUIConfig: widget.keyboardUIConfig,
           digits: widget.digits,
+          actionButtons: Positioned(
+            child: Align(
+              alignment: Alignment.bottomCenter,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  widget.bioButton != null ? widget.bioButton! : Container(),
+                  _buildDeleteButton()
+                ],
+              ),
+            ),
+          )
         ),
       );
 
