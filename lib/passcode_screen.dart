@@ -19,6 +19,7 @@ class PasscodeScreen extends StatefulWidget {
   // Cancel button and delete button will be switched based on the screen state
   final Widget cancelButton;
   final Widget deleteButton;
+  final Widget? bioButton;
   final Stream<bool> shouldTriggerVerification;
   final CircleUIConfig circleUIConfig;
   final KeyboardUIConfig keyboardUIConfig;
@@ -130,6 +131,12 @@ class _PasscodeScreenState extends State<PasscodeScreen>
               child: _buildDeleteButton(),
             ),
           ),
+          Positioned(
+            child: Align(
+              alignment: Alignment.bottomLeft,
+              child: widget.bioButton != null ? widget.bioButton : Container(),
+            ),
+          )
         ],
       );
 
