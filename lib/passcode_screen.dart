@@ -45,6 +45,7 @@ class PasscodeScreen extends StatefulWidget {
     KeyboardUIConfig? keyboardUIConfig,
     this.bottomWidget,
     this.backgroundColor,
+    this.bioButton,
     this.cancelCallback,
     this.digits,
   })  : circleUIConfig = circleUIConfig ?? const CircleUIConfig(),
