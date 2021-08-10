@@ -33,6 +33,7 @@ class KeyboardUIConfig {
 class Keyboard extends StatelessWidget {
   final KeyboardUIConfig keyboardUIConfig;
   final KeyboardTapCallback onKeyboardTap;
+  final Widget actionButtons;
 
   //should have a proper order [1...9, 0]
   final List<String>? digits;
@@ -42,6 +43,7 @@ class Keyboard extends StatelessWidget {
     required this.keyboardUIConfig,
     required this.onKeyboardTap,
     this.digits,
+    required this.actionButtons
   }) : super(key: key);
 
   @override
@@ -66,11 +68,16 @@ class Keyboard extends StatelessWidget {
       width: keyboardSize.width,
       height: keyboardSize.height,
       margin: EdgeInsets.only(top: 16),
-      child: AlignedGrid(
-        keyboardSize: keyboardSize,
-        children: List.generate(10, (index) {
-          return _buildKeyboardDigit(keyboardItems[index]);
-        }),
+      child: Stack(
+        children: [
+          AlignedGrid(
+            keyboardSize: keyboardSize,
+            children: List.generate(10, (index) {
+              return _buildKeyboardDigit(keyboardItems[index]);
+            }),
+          ),
+          this.actionButtons
+        ],
       ),
     );
   }
