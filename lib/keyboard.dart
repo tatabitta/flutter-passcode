@@ -70,13 +70,13 @@ class Keyboard extends StatelessWidget {
       margin: EdgeInsets.only(top: 16),
       child: Stack(
         children: [
+          this.actionButtons,
           AlignedGrid(
             keyboardSize: keyboardSize,
             children: List.generate(10, (index) {
               return _buildKeyboardDigit(keyboardItems[index]);
             }),
           ),
-          this.actionButtons
         ],
       ),
     );
