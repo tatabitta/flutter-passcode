@@ -184,25 +184,45 @@ class _PasscodeScreenState extends State<PasscodeScreen>
         ],
       );
 
-  _buildKeyboard() => Container(
-        child: Keyboard(
+  _buildKeyboard() {
+    final runSpacing = 4;
+    final columns = 3;
+    final primarySize = (MediaQuery.of(context).size.height / 2) * .75;
+    final itemSize = (primarySize - runSpacing * (columns - 1)) / columns;
+    return Container(
+      child: Keyboard(
           onKeyboardTap: _onKeyboardButtonPressed,
           keyboardUIConfig: widget.keyboardUIConfig,
           digits: widget.digits,
-          actionButtons: Positioned(
+          actionButtons: Positioned.fill(
             child: Align(
               alignment: Alignment.bottomCenter,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  widget.bioButton != null ? widget.bioButton! : Container(),
-                  _buildDeleteButton()
-                ],
+              child: Container(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      height: itemSize,
+                      width: itemSize,
+                      child: Center(
+                        child: widget.bioButton != null ? widget.bioButton! : Container(),
+                      )
+                    ),
+                    Container(
+                      width: itemSize,
+                      height: itemSize,
+                      child: Center(
+                        child: _buildDeleteButton()
+                      )
+                    )
+                  ],
+                ),
               ),
             ),
           )
-        ),
-      );
+      ),
+    );
+  }
 
   List<Widget> _buildCircles() {
     var list = <Widget>[];
@@ -287,7 +307,6 @@ class _PasscodeScreenState extends State<PasscodeScreen>
       child: CupertinoButton(
         onPressed: _onDeleteCancelButtonPressed,
         child: Container(
-          margin: widget.keyboardUIConfig.digitInnerMargin,
           child: enteredPasscode.length == 0
               ? widget.cancelButton
               : widget.deleteButton,
