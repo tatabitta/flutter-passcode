@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 typedef KeyboardTapCallback = void Function(String text);
 
@@ -25,7 +26,7 @@ class KeyboardUIConfig {
     this.digitFillColor = Colors.transparent,
     this.digitTextStyle = const TextStyle(fontSize: 30, color: Colors.white),
     this.deleteButtonTextStyle =
-        const TextStyle(fontSize: 16, color: Colors.white),
+    const TextStyle(fontSize: 16, color: Colors.white),
     this.keyboardSize,
   });
 }
@@ -34,6 +35,8 @@ class Keyboard extends StatelessWidget {
   final KeyboardUIConfig keyboardUIConfig;
   final KeyboardTapCallback onKeyboardTap;
   final Widget actionButtons;
+  final _focusNode = FocusNode();
+  static String deleteButton = 'keyboard_delete_button';
 
   //should have a proper order [1...9, 0]
   final List<String>? digits;
@@ -59,7 +62,7 @@ class Keyboard extends StatelessWidget {
     final screenSize = MediaQuery.of(context).size;
     final keyboardHeight = screenSize.height > screenSize.width
         ? screenSize.height / 2
-        : screenSize.height - 80;
+        : screenSize.height - 320;
     final keyboardWidth = keyboardHeight * 3 / 4;
     final keyboardSize = this.keyboardUIConfig.keyboardSize != null
         ? this.keyboardUIConfig.keyboardSize!
@@ -70,13 +73,29 @@ class Keyboard extends StatelessWidget {
       margin: EdgeInsets.only(top: 16),
       child: Stack(
         children: [
-          AlignedGrid(
-            keyboardSize: keyboardSize,
-            children: List.generate(10, (index) {
-              return _buildKeyboardDigit(keyboardItems[index]);
-            }),
-          ),
           this.actionButtons,
+          RawKeyboardListener(
+            focusNode: _focusNode,
+            autofocus: true,
+            onKey: (event) {
+              if (event is RawKeyUpEvent) {
+                if (keyboardItems.contains(event.data.keyLabel)) {
+                  onKeyboardTap(event.logicalKey.keyLabel);
+                  return;
+                }
+                if (event.logicalKey.keyLabel== 'Backspace' || event.logicalKey.keyLabel == 'Delete') {
+                  onKeyboardTap(Keyboard.deleteButton);
+                  return;
+                }
+              }
+            },
+            child: AlignedGrid(
+              keyboardSize: keyboardSize,
+              children: List.generate(10, (index) {
+                return _buildKeyboardDigit(keyboardItems[index]);
+              }),
+            ),
+          ),
         ],
       ),
     );
@@ -147,10 +166,10 @@ class AlignedGrid extends StatelessWidget {
       alignment: WrapAlignment.center,
       children: children
           .map((item) => Container(
-                width: itemSize,
-                height: itemSize,
-                child: item,
-              ))
+        width: itemSize,
+        height: itemSize,
+        child: item,
+      ))
           .toList(growable: false),
     );
   }
