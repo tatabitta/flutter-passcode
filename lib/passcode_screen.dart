@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:passcode_screen/circle.dart';
 import 'package:passcode_screen/keyboard.dart';
 import 'package:passcode_screen/shake_curve.dart';
+import 'package:flutter/foundation.dart';
+
 
 typedef PasswordEnteredCallback = void Function(String text);
 typedef IsValidCallback = void Function();
@@ -90,19 +92,34 @@ class _PasscodeScreenState extends State<PasscodeScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: widget.backgroundColor ?? Colors.black.withOpacity(0.8),
-      body: SafeArea(
-        child: OrientationBuilder(
-          builder: (context, orientation) {
-            return orientation == Orientation.portrait
-                ? _buildPortraitPasscodeScreen()
-                : _buildLandscapePasscodeScreen();
-          },
+    if (kIsWeb) {
+       return _buildPortraitPasscodeScreenWeb();
+    } else {
+      return Scaffold(
+        backgroundColor: widget.backgroundColor ?? Colors.black.withOpacity(0.8),
+        body: SafeArea(
+            child: _buildPortraitPasscodeScreen()
+        ),
+      );
+    }
+  }
+
+  _buildPortraitPasscodeScreenWeb() => Column(
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: [
+      widget.title,
+      Container(
+        margin: const EdgeInsets.only(top: 20),
+        height: 40,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: _buildCircles(),
         ),
       ),
-    );
-  }
+      _buildKeyboard(),
+      widget.bottomWidget ?? Container()
+    ],
+  );
 
   _buildPortraitPasscodeScreen() => Stack(
         children: [
@@ -187,7 +204,7 @@ class _PasscodeScreenState extends State<PasscodeScreen>
   _buildKeyboard() {
     final runSpacing = 4;
     final columns = 3;
-    final primarySize = (MediaQuery.of(context).size.height / 2) * .75;
+    final primarySize = (MediaQuery.of(context).size.height / 2) * (kIsWeb? .6 :.75);
     final itemSize = (primarySize - runSpacing * (columns - 1)) / columns;
     return Container(
       child: Keyboard(
@@ -211,7 +228,8 @@ class _PasscodeScreenState extends State<PasscodeScreen>
                     Container(
                       width: itemSize,
                       height: itemSize,
-                      child: Center(
+                      child: kIsWeb?  _buildDeleteButton() :
+                      Center(
                         child: _buildDeleteButton()
                       )
                     )
