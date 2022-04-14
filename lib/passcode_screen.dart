@@ -9,7 +9,6 @@ import 'package:passcode_screen/keyboard.dart';
 import 'package:passcode_screen/shake_curve.dart';
 import 'package:flutter/foundation.dart';
 
-
 typedef PasswordEnteredCallback = void Function(String text);
 typedef IsValidCallback = void Function();
 typedef CancelCallback = void Function();
@@ -73,7 +72,7 @@ class _PasscodeScreenState extends State<PasscodeScreen>
     controller = AnimationController(
         duration: const Duration(milliseconds: 500), vsync: this);
     final Animation curve =
-        CurvedAnimation(parent: controller, curve: ShakeCurve());
+    CurvedAnimation(parent: controller, curve: ShakeCurve());
     animation = Tween(begin: 0.0, end: 10.0).animate(curve as Animation<double>)
       ..addStatusListener((status) {
         if (status == AnimationStatus.completed) {
@@ -92,119 +91,47 @@ class _PasscodeScreenState extends State<PasscodeScreen>
 
   @override
   Widget build(BuildContext context) {
-    if (kIsWeb) {
-       return _buildPortraitPasscodeScreenWeb();
-    } else {
-      return Scaffold(
-        backgroundColor: widget.backgroundColor ?? Colors.black.withOpacity(0.8),
-        body: SafeArea(
-            child: _buildPortraitPasscodeScreen()
-        ),
-      );
+    if ( kIsWeb ) {
+      return _buildPortraitPasscodeScreen();
     }
+
+    return Scaffold(
+      backgroundColor: widget.backgroundColor ?? Colors.black.withOpacity(0.8),
+      body: SafeArea(
+        child: _buildPortraitPasscodeScreen()
+      ),
+    );
   }
 
-  _buildPortraitPasscodeScreenWeb() => Column(
-    mainAxisAlignment: MainAxisAlignment.center,
+  _buildPortraitPasscodeScreen() => Stack(
     children: [
-      widget.title,
-      Container(
-        margin: const EdgeInsets.only(top: 20),
-        height: 40,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: _buildCircles(),
+      Positioned(
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              widget.title,
+              Container(
+                margin: const EdgeInsets.only(top: 20),
+                height: 40,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: _buildCircles(),
+                ),
+              ),
+              _buildKeyboard(),
+              widget.bottomWidget ?? Container(),
+            ],
+          ),
         ),
       ),
-      _buildKeyboard(),
-      widget.bottomWidget ?? Container()
     ],
   );
-
-  _buildPortraitPasscodeScreen() => Stack(
-        children: [
-          Positioned(
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  widget.title,
-                  Container(
-                    margin: const EdgeInsets.only(top: 20),
-                    height: 40,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: _buildCircles(),
-                    ),
-                  ),
-                  _buildKeyboard(),
-                  widget.bottomWidget ?? Container()
-                ],
-              ),
-            ),
-          )
-        ],
-      );
-
-  _buildLandscapePasscodeScreen() => Stack(
-        children: [
-          Positioned(
-            child: Center(
-              child: Row(
-                mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Container(
-                    child: Stack(
-                      children: <Widget>[
-                        Positioned(
-                          child: Align(
-                            alignment: Alignment.center,
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                widget.title,
-                                Container(
-                                  margin: const EdgeInsets.only(top: 20),
-                                  height: 40,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: _buildCircles(),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        widget.bottomWidget != null
-                            ? Positioned(
-                                child: Align(
-                                    alignment: Alignment.topCenter,
-                                    child: widget.bottomWidget),
-                              )
-                            : Container()
-                      ],
-                    ),
-                  ),
-                  _buildKeyboard(),
-                ],
-              ),
-            ),
-          ),
-          Positioned(
-            child: Align(
-              alignment: Alignment.bottomRight,
-              child: _buildDeleteButton(),
-            ),
-          )
-        ],
-      );
 
   _buildKeyboard() {
     final runSpacing = 4;
     final columns = 3;
-    final primarySize = (MediaQuery.of(context).size.height / 2) * (kIsWeb? .6 :.75);
+    final primarySize = (MediaQuery.of(context).size.height / 2) * .75;
     final itemSize = (primarySize - runSpacing * (columns - 1)) / columns;
     return Container(
       child: Keyboard(
@@ -219,19 +146,18 @@ class _PasscodeScreenState extends State<PasscodeScreen>
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Container(
-                      height: itemSize,
-                      width: itemSize,
-                      child: Center(
-                        child: widget.bioButton != null ? widget.bioButton! : Container(),
-                      )
+                        height: itemSize,
+                        width: itemSize,
+                        child: Center(
+                          child: widget.bioButton != null ? widget.bioButton! : Container(),
+                        )
                     ),
                     Container(
-                      width: itemSize,
-                      height: itemSize,
-                      child: kIsWeb?  _buildDeleteButton() :
-                      Center(
-                        child: _buildDeleteButton()
-                      )
+                        width: itemSize,
+                        height: itemSize,
+                        child: Center(
+                            child: _buildDeleteButton()
+                        )
                     )
                   ],
                 ),
@@ -275,6 +201,10 @@ class _PasscodeScreenState extends State<PasscodeScreen>
   }
 
   _onKeyboardButtonPressed(String text) {
+    if (text == Keyboard.deleteButton) {
+      _onDeleteCancelButtonPressed();
+      return;
+    }
     setState(() {
       if (enteredPasscode.length < widget.passwordDigits) {
         enteredPasscode += text;
